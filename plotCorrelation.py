@@ -4,14 +4,14 @@ from array import array
 
 
 
-def PlotCorrelation(file1,file2):
+def PlotCorrelation(file1,file2,plane=0):
 
 
     f = TFile(file1,"open")
     f2= TFile(file2,"open")
 
     f.cd()
-    t = f.Get("Plane0/Hits")
+    t = f.Get("Plane%i/Hits"%plane)
     f2.cd()
     t2= f2.Get("Hits")
 
@@ -60,11 +60,10 @@ def PlotCorrelation(file1,file2):
     can.cd(4)                         
     histoyy.Draw("colz")
 
-    can.SaveAs("correlation_plane0_DUT.png")
-    a=raw_input()
+    can.SaveAs("correlation_plane%i_DUT.png"%plane)
     return histoxx,histoxy,histoyx,histoyy
         
 
-
-histox=PlotCorrelation("cosmic_007064.root","FEI4_raw_file.root")
+for i in range(6):
+    histos=PlotCorrelation("cosmic_007064.root","FEI4_raw_file.root",i)
 

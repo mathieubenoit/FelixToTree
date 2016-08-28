@@ -28,7 +28,7 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
     f = TFile("FEI4_raw_file.root","recreate")
     t = TTree("Hits","Raw data tree")
 
-    maxn=25
+    maxn=300
     row_b = array( 'i', maxn*[ 0 ] )
     col_b = array( 'i', maxn*[ 0 ] )
     tot_b = array( 'i', maxn*[ 0 ] )
@@ -56,21 +56,43 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
     events = []
     event = []
     previous_bcid=-1
+    previous_ecid=-1
     for i,bcid_t in enumerate(bcid):
         if previous_bcid == -1 :
             previous_bcid=bcid_t
+            previous_ecid=ecid[i]
             event = [[row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]]]
         else:
-            if previous_bcid==bcid_t :
+            if abs(previous_bcid-bcid_t)<16 and previous_ecid==ecid[i]  :
                 previous_bcid=bcid_t
+                previous_ecid=ecid[i]
                 event.append([row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]])
             else:
-                events.append(event)
+                events.append([ii for n,ii in enumerate(event) if ii not in event[:n]])
                 previous_bcid=bcid_t
+                previous_ecid=ecid[i]
                 event = [[row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]]]
-                
-    for event in events:
+
+
+    ## #"""remove doubles"""
+    ## previous_event=[]
+    ## for event in events:
+    ##     tevent=event
+    ##     for i,hit in enumerate(tevent):
+    ##         if event==previous_event:
+    ##             event.pop(i)
+    ##         previous_event=event
+
+                        
+    for n,event in enumerate(events):
         for i,hits in enumerate(event):
+
+            if n%1000==0:
+                print "bcid and ecid for this event #%i : "%n
+                for hit in event:
+                    print "X:%i Y:%i bcid:%i ecid:%i tot:%i,lv1:%i"%(hit[1],hit[0],hit[4],hit[5],hit[2],hit[3])
+
+            
             row_b[i]=hits[0]
             col_b[i]=hits[1]
             tot_b[i]=hits[2]            
@@ -83,6 +105,8 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
         t.Fill()
 
 
+ 
+        
     f.Write()
     f.Close()
 
