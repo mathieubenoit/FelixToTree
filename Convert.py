@@ -1,6 +1,6 @@
 from ROOT import TCanvas,TTree,TH2I,TFile
 from array import array
-
+import itertools
 
 def readfiles(foldername):
 
@@ -75,30 +75,23 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
 
 
     ## #"""remove doubles"""
-    ## previous_event=[]
-    ## for event in events:
-    ##     tevent=event
-    ##     for i,hit in enumerate(tevent):
-    ##         if event==previous_event:
-    ##             event.pop(i)
-    ##         previous_event=event
+    tevents=[]
+    for event in events:
+        event.sort()
+        tevents.append(list(event for event,_ in itertools.groupby(event)))
+    events =tevents                  
 
-                        
     for n,event in enumerate(events):
-        for i,hits in enumerate(event):
-
-            if n%1000==0:
-                print "bcid and ecid for this event #%i : "%n
-                for hit in event:
-                    print "X:%i Y:%i bcid:%i ecid:%i tot:%i,lv1:%i"%(hit[1],hit[0],hit[4],hit[5],hit[2],hit[3])
-
-            
-            row_b[i]=hits[0]
-            col_b[i]=hits[1]
-            tot_b[i]=hits[2]            
-            lv1_b[i]=hits[3]
-            bcid_b[i]=hits[4] 
-            ecid_b[i]=hits[5]
+        if n%10000==0:
+            print "bcid and ecid for this event #%i : "%n
+        for i,hit in enumerate(event):
+            #print "X:%i Y:%i bcid:%i ecid:%i tot:%i,lv1:%i"%(hit[1],hit[0],hit[4],hit[5],hit[2],hit[3])         
+            row_b[i]=hit[0]
+            col_b[i]=hit[1]
+            tot_b[i]=hit[2]            
+            lv1_b[i]=hit[3]
+            bcid_b[i]=hit[4] 
+            ecid_b[i]=hit[5]
         event_size[0]=len(event) 
         #print event_size
         #print row_b
