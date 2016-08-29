@@ -66,12 +66,20 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
             if abs(previous_bcid-bcid_t)<16 and previous_ecid==ecid[i]  :
                 previous_bcid=bcid_t
                 previous_ecid=ecid[i]
-                event.append([row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]])
-            else:
+                if tot[i]==-1:
+			event.append([row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]])
+		else:
+			event.append([row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]])
+            
+	    
+	    else:
                 events.append([ii for n,ii in enumerate(event) if ii not in event[:n]])
                 previous_bcid=bcid_t
                 previous_ecid=ecid[i]
-                event = [[row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]]]
+                if tot[i]==-1:
+			event=[[row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]]]
+		else:             
+			event = [[row[i],col[i],tot[i],lv1[i],bcid[i],ecid[i]]]
 
 
     ## #"""remove doubles"""
@@ -82,10 +90,11 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
     events =tevents                  
 
     for n,event in enumerate(events):
-        if n%10000==0:
-            print "bcid and ecid for this event #%i : "%n
+        if n>2360 and n<2380 :
+            print "event #%i"%n
         for i,hit in enumerate(event):
-            #print "X:%i Y:%i bcid:%i ecid:%i tot:%i,lv1:%i"%(hit[1],hit[0],hit[4],hit[5],hit[2],hit[3])         
+            if n>2360 and n<2380 :
+	    	print "X:%i Y:%i bcid:%i ecid:%i tot:%i,lv1:%i"%(hit[1],hit[0],hit[4],hit[5],hit[2],hit[3])         
             row_b[i]=hit[0]
             col_b[i]=hit[1]
             tot_b[i]=hit[2]            
@@ -104,5 +113,5 @@ def buildtree(row,col,tot,lv1,bcid,ecid):
     f.Close()
 
 
-row,col,tot,lv1,bcid,ecid = readfiles("fei4_ccpd_20160827_1hr")
+row,col,tot,lv1,bcid,ecid = readfiles("fei4-test")
 buildtree(row,col,tot,lv1,bcid,ecid)
